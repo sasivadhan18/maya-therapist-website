@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Lucide Icons CDN -->
-  <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script>
     tailwind.config = {
@@ -58,7 +58,7 @@
 
     /* Glassmorphism Styles */
     .glass-nav-pill {
-      background: rgba(250, 248, 244, 0.88);
+      background: rgba(250, 248, 244, 0.90);
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
       border: 1px solid rgba(255, 255, 255, 0.85);
@@ -119,24 +119,54 @@
       box-shadow: 0 8px 22px -3px rgba(71, 99, 85, 0.4);
     }
 
-    /* Pinned Top-Left Floating Consult Button */
-    .top-left-consult-btn {
+    /* Scroll Interchange Behavior */
+    #consultButtonWrapper {
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: top, left, transform;
+    }
+
+    /* Original Resting State: below the tabs bar on the left */
+    .consult-initial {
+      top: 5rem; /* 80px on mobile, responsive to 96px in sm */
+      left: 0.75rem; /* left-3 on mobile, left-6 on sm */
+      transform: translate(0, 0);
+    }
+    @media (min-width: 640px) {
+      .consult-initial {
+        top: 6rem; /* 96px */
+        left: 1.5rem;
+      }
+    }
+
+    /* Scrolled State: flies to the exact top center where the tabs bar was pinned */
+    .consult-pinned-top {
+      top: 0.75rem !important; /* matches top-3 */
+      left: 50% !important;
+      transform: translate(-50%, 0) !important;
+    }
+    @media (min-width: 640px) {
+      .consult-pinned-top {
+        top: 1.25rem !important; /* matches top-5 */
+      }
+    }
+
+    .scroll-consult-btn {
       background: rgba(26, 46, 51, 0.94);
       backdrop-filter: blur(18px) saturate(180%);
       -webkit-backdrop-filter: blur(18px) saturate(180%);
       border: 1px solid rgba(255, 255, 255, 0.28);
-      box-shadow: 0 12px 30px -5px rgba(26, 46, 51, 0.3), 0 0 0 1px rgba(71, 99, 85, 0.2);
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 10px 25px -4px rgba(26, 46, 51, 0.3), 0 0 0 1px rgba(71, 99, 85, 0.2);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .top-left-consult-btn:hover {
+    .scroll-consult-btn:hover {
       background: #476355;
       transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 16px 36px -4px rgba(71, 99, 85, 0.45);
+      box-shadow: 0 14px 30px -4px rgba(71, 99, 85, 0.45);
     }
 
     /* Dynamic Slide-out Drawer */
     #consultDrawer {
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .drawer-open {
       transform: translateX(0%) !important;
@@ -174,42 +204,40 @@
     }
 
     @keyframes beaconPulse {
-      0%, 100% { box-shadow: 0 12px 30px -6px rgba(26, 46, 51, 0.12), 0 0 0 0 rgba(71, 99, 85, 0.35); }
-      50% { box-shadow: 0 14px 35px -6px rgba(26, 46, 51, 0.18), 0 0 0 6px rgba(71, 99, 85, 0.12); }
+      0%, 100% { box-shadow: 0 10px 25px -5px rgba(26, 46, 51, 0.12), 0 0 0 0 rgba(71, 99, 85, 0.35); }
+      50% { box-shadow: 0 12px 30px -5px rgba(26, 46, 51, 0.18), 0 0 0 5px rgba(71, 99, 85, 0.12); }
     }
     .nav-beacon {
       animation: beaconPulse 2.8s infinite ease-in-out;
     }
   </style>
 </head>
-<body class="text-coastal-ocean font-sans antialiased selection:bg-coastal-sage selection:text-white min-h-screen">
+<body class="text-coastal-ocean font-sans antialiased selection:bg-coastal-sage selection:text-white min-h-screen overflow-x-hidden">
 
-  <!-- ==================== ALWAYS PINNED TOP-LEFT FLOATING CONSULT BUTTON ==================== -->
-  <aside class="fixed top-5 left-4 sm:left-6 z-50">
+  <!-- ==================== INTERCHANGEABLE CONSULT BUTTON ==================== -->
+  <aside id="consultButtonWrapper" class="fixed consult-initial z-50">
     <button 
       id="openConsultDrawerBtn"
       onclick="openConsultDrawer()"
       aria-label="Book a Consultation"
-      class="top-left-consult-btn text-white rounded-full px-4 py-3 flex items-center gap-2.5 group cursor-pointer">
-      <div class="relative flex h-2.5 w-2.5">
+      class="scroll-consult-btn text-white rounded-full p-2.5 sm:px-4 sm:py-2.5 flex items-center gap-2 group cursor-pointer shadow-lg">
+      <div class="relative flex h-2.5 w-2.5 shrink-0">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
       </div>
-      <div class="flex items-center gap-1.5 font-medium text-xs tracking-wide">
-        <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-300 group-hover:scale-110 transition-transform"></i>
-        <span>Consult</span>
-      </div>
+      <i data-lucide="calendar" class="w-4 h-4 text-emerald-300 group-hover:scale-110 transition-transform shrink-0"></i>
+      <span class="font-medium text-xs tracking-wide">Consult</span>
     </button>
   </aside>
 
   <!-- ==================== DYNAMIC CONSULTATION SLIDE-OUT DRAWER ==================== -->
   <div id="drawerOverlay" class="fixed inset-0 bg-coastal-ocean/60 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300" onclick="closeConsultDrawer()"></div>
 
-  <div id="consultDrawer" class="drawer-closed fixed top-0 left-0 bottom-0 w-full max-w-md bg-coastal-ocean text-white z-50 shadow-2xl p-6 sm:p-8 flex flex-col justify-between overflow-y-auto border-r border-white/15">
+  <div id="consultDrawer" class="drawer-closed fixed top-0 left-0 bottom-0 w-[92vw] sm:w-full max-w-md bg-coastal-ocean text-white z-50 shadow-2xl p-5 sm:p-7 flex flex-col justify-between overflow-y-auto border-r border-white/15">
     
     <div>
       <!-- Drawer Header -->
-      <div class="flex items-center justify-between pb-5 border-b border-white/15">
+      <div class="flex items-center justify-between pb-4 border-b border-white/15">
         <div class="flex items-center gap-2">
           <span class="p-1.5 rounded-lg bg-white/10 text-emerald-300">
             <i data-lucide="calendar-check" class="w-4 h-4"></i>
@@ -231,12 +259,12 @@
           Confidential 15-Minute Inquiry
         </p>
         <p class="text-[11px] text-white/60 leading-relaxed">
-          In-Person (Santa Monica) or CA-wide Telehealth. Reviewed within 1–2 business days.
+          In-Person (Santa Monica) or CA-wide Telehealth[cite: 1, 2]. Reviewed within 1–2 business days.
         </p>
       </div>
 
       <!-- Direct Email Router Form Inside Dynamic Drawer -->
-      <form id="drawerEmailForm" class="space-y-3.5 text-xs" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <form id="drawerEmailForm" class="space-y-3 text-xs" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
         <div>
           <label class="block text-white/70 mb-1">Your Full Name</label>
           <input type="text" name="name" required class="w-full px-3.5 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white text-xs focus:outline-none focus:border-emerald-300 transition-colors" placeholder="Jane Doe" />
@@ -277,32 +305,33 @@
     </div>
 
     <!-- Drawer Footer -->
-    <div class="pt-6 border-t border-white/10 text-[11px] text-white/50 text-center">
-      <p>Office: 123th Street 45 W, Santa Monica, CA 90401</p>
+    <div class="pt-5 border-t border-white/10 text-[11px] text-white/50 text-center">
+      <p>Office: 123th Street 45 W, Santa Monica, CA 90401[cite: 2]</p>
       <p class="mt-0.5">Emergency? Dial 988 or go to your nearest ER.</p>
     </div>
   </div>
 
-  <!-- ==================== DYNAMIC ROLLABLE FLOATING HEADER ==================== -->
-  <header class="fixed top-5 inset-x-0 z-40 flex flex-col items-center px-4 rollout-container pointer-events-none">
+  <!-- ==================== UNPINNABLE ON SCROLL HOVER BAR ==================== -->
+  <!-- Starts at top of page, naturally scrolls off screen instead of staying pinned -->
+  <header id="unpinnedHeader" class="absolute top-3 sm:top-5 inset-x-0 z-40 flex flex-col items-center px-3 sm:px-4 rollout-container pointer-events-none transition-opacity duration-300">
     
     <!-- Top Pill Trigger -->
     <div id="rollerHeader" 
-         class="glass-nav-pill nav-beacon rounded-full px-5 py-3 flex items-center justify-between gap-6 cursor-pointer max-w-xl w-full select-none pointer-events-auto"
+         class="glass-nav-pill nav-beacon rounded-full px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3 sm:gap-6 cursor-pointer max-w-xl w-full select-none pointer-events-auto shadow-md"
          aria-label="Navigation Menu Trigger">
       
-      <div class="flex items-center gap-3">
-        <span class="relative flex h-3 w-3">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <span class="relative flex h-2.5 w-2.5 shrink-0">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-coastal-sage"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-coastal-sage"></span>
         </span>
-        <div class="flex flex-col">
-          <span class="font-serif font-semibold text-base leading-tight tracking-wide">Dr. Maya Reynolds, PsyD</span>
-          <span class="text-[11px] text-coastal-muted tracking-tight">Santa Monica, CA &bull; In-Person &amp; Telehealth</span>
+        <div class="flex flex-col truncate">
+          <span class="font-serif font-semibold text-xs sm:text-base leading-tight tracking-wide truncate">Dr. Maya Reynolds, PsyD</span>
+          <span class="text-[10px] sm:text-[11px] text-coastal-muted tracking-tight truncate">Santa Monica, CA &bull; Telehealth[cite: 1, 2]</span>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
         <!-- Direct Quick Locate Button in Header Pill -->
         <a href="https://www.google.com/maps/dir/?api=1&destination=123th+Street+45+W,+Santa+Monica,+CA+90401" 
            target="_blank" 
@@ -313,7 +342,7 @@
           <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
         </a>
 
-        <span id="rollerHintText" class="hidden sm:inline-block text-xs font-medium text-coastal-sage bg-coastal-lightSage px-2.5 py-1 rounded-full transition-colors">
+        <span id="rollerHintText" class="hidden md:inline-block text-xs font-medium text-coastal-sage bg-coastal-lightSage px-2.5 py-1 rounded-full transition-colors">
           Hover to Explore
         </span>
         <div id="rollerChevron" class="p-1 rounded-full bg-white/70 border border-black/5 transition-transform duration-300">
@@ -323,59 +352,56 @@
     </div>
 
     <!-- First Visit Floating Coachmark -->
-    <div id="firstVisitCoachmark" class="mt-2 glass-card px-4 py-1.5 rounded-full text-xs text-coastal-slate flex items-center gap-2 shadow-md animate-bounce pointer-events-auto">
-      <i data-lucide="sparkles" class="w-3.5 h-3.5 text-coastal-terracotta"></i>
-      <span>Hover menu to explore bio &amp; tap "Consult" on the top left anytime</span>
+    <div id="firstVisitCoachmark" class="mt-2 glass-card px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs text-coastal-slate flex items-center gap-1.5 shadow-md animate-bounce pointer-events-auto max-w-[90vw] text-center justify-center">
+      <i data-lucide="sparkles" class="w-3 h-3 text-coastal-terracotta shrink-0"></i>
+      <span class="truncate">Hover menu to explore bio &bull; Scroll to pin consult</span>
       <button onclick="dismissCoachmark()" class="ml-1 text-coastal-muted hover:text-coastal-ocean">&times;</button>
     </div>
 
     <!-- Rolled Out Dynamic Menu Panel -->
     <nav id="rollerMenu" 
-         class="rollout-panel rollout-closed glass-nav-pill rounded-3xl mt-2 w-full max-w-xl p-5 shadow-2xl flex flex-col gap-4 border border-white/90 pointer-events-auto">
+         class="rollout-panel rollout-closed glass-nav-pill rounded-3xl mt-2 w-full max-w-xl p-4 sm:p-5 shadow-2xl flex flex-col gap-3 sm:gap-4 border border-white/90 pointer-events-auto">
       
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <a href="#about" class="flex flex-col items-center text-center p-3 rounded-2xl hover:bg-coastal-lightSage/70 transition-colors group">
-          <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center text-coastal-sage shadow-sm group-hover:scale-105 transition-transform">
+        <a href="#about" class="flex flex-col items-center text-center p-2.5 sm:p-3 rounded-2xl hover:bg-coastal-lightSage/70 transition-colors group">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white flex items-center justify-center text-coastal-sage shadow-sm group-hover:scale-105 transition-transform">
             <i data-lucide="user-round" class="w-4 h-4"></i>
           </div>
-          <span class="text-xs font-medium mt-2 text-coastal-slate">About Maya</span>
+          <span class="text-xs font-medium mt-1.5 text-coastal-slate">About Maya</span>
         </a>
 
-        <a href="#specialties" class="flex flex-col items-center text-center p-3 rounded-2xl hover:bg-coastal-lightSage/70 transition-colors group">
-          <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center text-coastal-sage shadow-sm group-hover:scale-105 transition-transform">
+        <a href="#specialties" class="flex flex-col items-center text-center p-2.5 sm:p-3 rounded-2xl hover:bg-coastal-lightSage/70 transition-colors group">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white flex items-center justify-center text-coastal-sage shadow-sm group-hover:scale-105 transition-transform">
             <i data-lucide="brain" class="w-4 h-4"></i>
           </div>
-          <span class="text-xs font-medium mt-2 text-coastal-slate">Specialties</span>
+          <span class="text-xs font-medium mt-1.5 text-coastal-slate">Specialties</span>
         </a>
 
-        <a href="#office" class="flex flex-col items-center text-center p-3 rounded-2xl hover:bg-coastal-lightSage/70 transition-colors group">
-          <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center text-coastal-sage shadow-sm group-hover:scale-105 transition-transform">
+        <a href="#office" class="flex flex-col items-center text-center p-2.5 sm:p-3 rounded-2xl hover:bg-coastal-lightSage/70 transition-colors group">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white flex items-center justify-center text-coastal-sage shadow-sm group-hover:scale-105 transition-transform">
             <i data-lucide="map-pin" class="w-4 h-4"></i>
           </div>
-          <span class="text-xs font-medium mt-2 text-coastal-slate">Office &amp; Practice</span>
+          <span class="text-xs font-medium mt-1.5 text-coastal-slate">Office &amp; Practice</span>
         </a>
 
-        <a href="#quiz" class="flex flex-col items-center text-center p-3 rounded-2xl hover:bg-coastal-lightSage/70 transition-colors group">
-          <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center text-coastal-sage shadow-sm group-hover:scale-105 transition-transform">
+        <a href="#quiz" class="flex flex-col items-center text-center p-2.5 sm:p-3 rounded-2xl hover:bg-coastal-lightSage/70 transition-colors group">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white flex items-center justify-center text-coastal-sage shadow-sm group-hover:scale-105 transition-transform">
             <i data-lucide="activity" class="w-4 h-4"></i>
           </div>
-          <span class="text-xs font-medium mt-2 text-coastal-slate">Self-Check</span>
+          <span class="text-xs font-medium mt-1.5 text-coastal-slate">Self-Check</span>
         </a>
       </div>
 
-      <div class="pt-3 border-t border-coastal-stone/60 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-2">
-          <a href="https://www.google.com/maps/dir/?api=1&destination=123th+Street+45+W,+Santa+Monica,+CA+90401" 
-             target="_blank" 
-             rel="noopener noreferrer"
-             class="glass-btn-locate text-xs font-medium px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5">
-            <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
-            <span>Locate Office</span>
-          </a>
-          <span class="text-[11px] text-coastal-muted hidden sm:inline">123th St 45 W, Santa Monica</span>
-        </div>
+      <div class="pt-3 border-t border-coastal-stone/60 flex items-center justify-between gap-2">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=123th+Street+45+W,+Santa+Monica,+CA+90401" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           class="glass-btn-locate text-xs font-medium px-3 py-1.5 rounded-full inline-flex items-center gap-1.5">
+          <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
+          <span>Locate Office</span>
+        </a>
 
-        <button onclick="openConsultDrawer()" class="glass-btn-primary text-xs font-medium text-white px-4 py-2 rounded-full inline-flex items-center gap-1.5 ml-auto cursor-pointer">
+        <button onclick="openConsultDrawer()" class="glass-btn-primary text-xs font-medium text-white px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 cursor-pointer">
           <span>Book Consultation</span>
           <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
         </button>
@@ -384,26 +410,25 @@
   </header>
 
   <!-- ==================== HERO SECTION ==================== -->
-  <section class="pt-36 pb-20 px-6 max-w-6xl mx-auto min-h-[90vh] flex flex-col justify-center">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+  <section class="pt-32 sm:pt-40 pb-16 sm:pb-20 px-4 sm:px-6 max-w-6xl mx-auto min-h-[90vh] flex flex-col justify-center">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
       
-      <div class="lg:col-span-7 space-y-6">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-coastal-lightSage text-coastal-sage text-xs font-medium tracking-wide border border-coastal-sage/20">
+      <div class="lg:col-span-7 space-y-5 sm:space-y-6 text-center lg:text-left">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-coastal-lightSage text-coastal-sage text-xs font-medium tracking-wide border border-coastal-sage/20 mx-auto lg:mx-0">
           <i data-lucide="compass" class="w-3.5 h-3.5"></i>
-          <span>Santa Monica, CA &bull; Licensed Clinical Psychologist</span>
+          <span>Santa Monica, CA &bull; Licensed Psychologist</span>
         </div>
         
-        <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-coastal-ocean font-medium leading-[1.12]">
+        <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl text-coastal-ocean font-medium leading-[1.15]">
           Space to slow down, heal from within, and feel steady again.
         </h1>
         
-        <p class="text-coastal-slate text-base sm:text-lg font-light leading-relaxed max-w-2xl">
-          Warm, collaborative therapy for adults feeling overwhelmed by anxiety, burnout, trauma, or high internal pressure. Offering thoughtful in-person sessions in Santa Monica and secure telehealth throughout California.
+        <p class="text-coastal-slate text-sm sm:text-base lg:text-lg font-light leading-relaxed max-w-2xl mx-auto lg:mx-0">
+          Warm, collaborative therapy for adults feeling overwhelmed by anxiety, burnout, trauma, or high internal pressure[cite: 1, 2]. Offering thoughtful in-person sessions in Santa Monica and secure telehealth throughout California[cite: 1, 2].
         </p>
 
-        <div class="flex flex-wrap items-center gap-4 pt-2">
-          <!-- Button triggers floating dynamic consult drawer -->
-          <button onclick="openConsultDrawer()" class="glass-btn-primary text-white font-medium px-6 py-3.5 rounded-full inline-flex items-center gap-2 text-sm shadow-md cursor-pointer">
+        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-1">
+          <button onclick="openConsultDrawer()" class="glass-btn-primary text-white font-medium px-5 sm:px-6 py-3 rounded-full inline-flex items-center gap-2 text-xs sm:text-sm shadow-md cursor-pointer w-full sm:w-auto justify-center">
             <span>Schedule Initial Consultation</span>
             <i data-lucide="calendar" class="w-4 h-4"></i>
           </button>
@@ -411,56 +436,56 @@
           <a href="https://www.google.com/maps/dir/?api=1&destination=123th+Street+45+W,+Santa+Monica,+CA+90401" 
              target="_blank" 
              rel="noopener noreferrer"
-             class="glass-btn-locate font-medium px-6 py-3.5 rounded-full inline-flex items-center gap-2 text-sm">
+             class="glass-btn-locate font-medium px-5 sm:px-6 py-3 rounded-full inline-flex items-center gap-2 text-xs sm:text-sm w-full sm:w-auto justify-center">
             <i data-lucide="navigation" class="w-4 h-4"></i>
             <span>Locate Office</span>
           </a>
         </div>
 
-        <div class="pt-6 grid grid-cols-3 gap-4 border-t border-coastal-stone/80 max-w-lg">
+        <div class="pt-4 sm:pt-6 grid grid-cols-3 gap-2 sm:gap-4 border-t border-coastal-stone/80 max-w-lg mx-auto lg:mx-0">
           <div>
-            <div class="font-serif text-2xl font-semibold text-coastal-ocean">CBT &amp; EMDR</div>
-            <div class="text-xs text-coastal-muted">Evidence-based roots</div>
+            <div class="font-serif text-lg sm:text-2xl font-semibold text-coastal-ocean">CBT &amp; EMDR</div>
+            <div class="text-[11px] sm:text-xs text-coastal-muted">Evidence-based roots</div>
           </div>
           <div>
-            <div class="font-serif text-2xl font-semibold text-coastal-ocean">Body-Mind</div>
-            <div class="text-xs text-coastal-muted">Nervous system care</div>
+            <div class="font-serif text-lg sm:text-2xl font-semibold text-coastal-ocean">Body-Mind</div>
+            <div class="text-[11px] sm:text-xs text-coastal-muted">Nervous system care</div>
           </div>
           <div>
-            <div class="font-serif text-2xl font-semibold text-coastal-ocean">90401</div>
-            <div class="text-xs text-coastal-muted">Santa Monica sanctuary</div>
+            <div class="font-serif text-lg sm:text-2xl font-semibold text-coastal-ocean">90401</div>
+            <div class="text-[11px] sm:text-xs text-coastal-muted">Santa Monica sanctuary[cite: 2]</div>
           </div>
         </div>
       </div>
 
       <!-- Hero Visual Card with Original Drive Picture -->
-      <div class="lg:col-span-5 relative">
-        <div class="relative mx-auto max-w-md">
-          <div class="absolute -top-6 -left-6 w-80 h-80 bg-coastal-sage/15 rounded-full blur-3xl -z-10"></div>
-          <div class="glass-card rounded-3xl p-4 shadow-xl border border-white">
+      <div class="lg:col-span-5 relative px-2 sm:px-0">
+        <div class="relative mx-auto max-w-sm sm:max-w-md">
+          <div class="absolute -top-6 -left-6 w-72 h-72 bg-coastal-sage/15 rounded-full blur-3xl -z-10"></div>
+          <div class="glass-card rounded-3xl p-3 sm:p-4 shadow-xl border border-white">
             <div class="aspect-[4/5] rounded-2xl overflow-hidden relative bg-coastal-stone">
-              <img src="https://drive.google.com/thumbnail?id=1koVGhvD8mkiRXRukqrklo0HbB48p9PIa&sz=w1000" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'" 
-                   alt="Dr. Maya Reynolds, PsyD - Santa Monica Clinical Psychologist" 
+              <img src="https://drive.google.com/thumbnail?id=1koVGhvD8mkiRXRukqrklo0HbB48p9PIa&sz=w1000" 
+                   alt="Dr. Maya Reynolds, PsyD - Santa Monica Clinical Psychologist[cite: 2]" 
                    class="w-full h-full object-cover" />
               
-              <div class="absolute inset-0 bg-gradient-to-t from-coastal-ocean/75 via-transparent to-transparent flex flex-col justify-end p-6 text-white">
-                <p class="font-serif text-xl font-medium">Dr. Maya Reynolds, PsyD</p>
-                <p class="text-xs text-white/80">Licensed Clinical Psychologist</p>
-                <p class="text-[11px] text-emerald-200 mt-1 flex items-center gap-1.5">
+              <div class="absolute inset-0 bg-gradient-to-t from-coastal-ocean/80 via-transparent to-transparent flex flex-col justify-end p-4 sm:p-6 text-white">
+                <p class="font-serif text-lg sm:text-xl font-medium">Dr. Maya Reynolds, PsyD</p>
+                <p class="text-xs text-white/80">Licensed Clinical Psychologist[cite: 2]</p>
+                <p class="text-[10px] sm:text-[11px] text-emerald-200 mt-1 flex items-center gap-1.5">
                   <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
                   Accepting New California Clients
                 </p>
               </div>
             </div>
             
-            <div class="mt-4 p-3 bg-coastal-lightSage/60 rounded-xl flex items-center justify-between text-xs text-coastal-slate border border-coastal-sage/15">
-              <span class="flex items-center gap-1.5">
-                <i data-lucide="check-circle-2" class="w-4 h-4 text-coastal-sage"></i>
-                Individual Adults
+            <div class="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-coastal-lightSage/60 rounded-xl flex items-center justify-between text-xs text-coastal-slate border border-coastal-sage/15">
+              <span class="flex items-center gap-1">
+                <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-coastal-sage"></i>
+                Individual Adults[cite: 1, 2]
               </span>
-              <span class="flex items-center gap-1.5">
-                <i data-lucide="sparkles" class="w-4 h-4 text-coastal-sage"></i>
-                Trauma &amp; Burnout
+              <span class="flex items-center gap-1">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-coastal-sage"></i>
+                Trauma &amp; Burnout[cite: 1, 2]
               </span>
             </div>
           </div>
@@ -471,58 +496,58 @@
   </section>
 
   <!-- ==================== ABOUT DR. MAYA REYNOLDS ==================== -->
-  <section id="about" class="py-20 px-6 backdrop-blur-sm bg-white/40 border-y border-coastal-stone/70">
+  <section id="about" class="py-16 sm:py-20 px-4 sm:px-6 backdrop-blur-sm bg-white/40 border-y border-coastal-stone/70">
     <div class="max-w-5xl mx-auto">
       
-      <div class="text-center max-w-2xl mx-auto mb-16">
+      <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
         <span class="text-xs font-semibold text-coastal-sage uppercase tracking-wider">Clinical Philosophy</span>
-        <h2 class="font-serif text-3xl sm:text-4xl text-coastal-ocean mt-2">About Dr. Maya Reynolds, PsyD</h2>
-        <div class="w-12 h-0.5 bg-coastal-sage/40 mx-auto mt-4"></div>
+        <h2 class="font-serif text-2xl sm:text-4xl text-coastal-ocean mt-1 sm:mt-2">About Dr. Maya Reynolds, PsyD</h2>
+        <div class="w-12 h-0.5 bg-coastal-sage/40 mx-auto mt-3 sm:mt-4"></div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
         
-        <div class="lg:col-span-7 space-y-5 text-coastal-slate leading-relaxed font-light">
+        <div class="lg:col-span-7 space-y-4 sm:space-y-5 text-coastal-slate leading-relaxed font-light text-sm sm:text-base">
           <p class="text-base sm:text-lg text-coastal-ocean font-normal">
-            I’m a licensed clinical psychologist based in Santa Monica, California, offering therapy for adults who feel overwhelmed by anxiety, stress, or the lingering effects of past experiences.
+            I’m a licensed clinical psychologist based in Santa Monica, California, offering therapy for adults who feel overwhelmed by anxiety, stress, or the lingering effects of past experiences[cite: 1, 2].
           </p>
           <p>
-            Many of the people I work with are high-achieving, thoughtful, and self-aware—but internally feel exhausted, stuck in overthinking, or emotionally on edge. Clients frequently come to me feeling “functional” on the outside while quietly struggling with constant worry, tension in their body, difficulty sleeping, or a sense that they’re always bracing for something to go wrong.
+            Many of the people I work with are high-achieving, thoughtful, and self-aware—but internally feel exhausted, stuck in overthinking, or emotionally on edge[cite: 2]. Clients frequently come to me feeling “functional” on the outside while quietly struggling with constant worry, tension in their body, difficulty sleeping, or a sense that they’re always bracing for something to go wrong[cite: 2].
           </p>
           <p>
-            I take a warm, collaborative, and grounded approach to therapy. Sessions are structured enough to feel supportive, while still leaving space for reflection and depth. I integrate evidence-based methods such as <strong>Cognitive Behavioral Therapy (CBT)</strong>, <strong>EMDR</strong>, <strong>mindfulness-based practices</strong>, and <strong>body-oriented techniques</strong> to help clients understand both the emotional and physiological sides of what they’re experiencing.
+            I take a warm, collaborative, and grounded approach to therapy[cite: 1, 2]. Sessions are structured enough to feel supportive, while still leaving space for reflection and depth[cite: 2]. I integrate evidence-based methods such as <strong>Cognitive Behavioral Therapy (CBT)</strong>, <strong>EMDR</strong>, <strong>mindfulness-based practices</strong>, and <strong>body-oriented techniques</strong> to help clients understand both the emotional and physiological sides of what they’re experiencing[cite: 1, 2].
           </p>
           <p>
-            Trauma work is an essential pillar of my practice. I work with adults who have experienced single-incident trauma as well as complex, long-standing patterns stemming from childhood, relationships, or chronic stress. My approach is paced carefully, emphasizing safety, stabilization, and helping you feel more regulated in daily life—not just during our sessions.
+            Trauma work is an essential pillar of my practice[cite: 2]. I work with adults who have experienced single-incident trauma as well as complex, long-standing patterns stemming from childhood, relationships, or chronic stress[cite: 2]. My approach is paced carefully, emphasizing safety, stabilization, and helping you feel more regulated in daily life—not just during our sessions[cite: 2].
           </p>
           <p>
-            I believe therapy works best when you feel respected, understood, and actively involved. My goal is not just symptom relief, but helping you cultivate insight, resilience, and a deeper relationship with yourself.
+            I believe therapy works best when you feel respected, understood, and actively involved[cite: 2]. My goal is not just symptom relief, but helping you cultivate insight, resilience, and a deeper relationship with yourself[cite: 2].
           </p>
         </div>
 
         <div class="lg:col-span-5 space-y-4">
-          <div class="glass-card rounded-2xl p-6 border-l-4 border-coastal-sage">
-            <h3 class="font-serif text-xl font-semibold text-coastal-ocean mb-2">Core Clinical Pillars</h3>
-            <ul class="space-y-3 text-sm text-coastal-slate">
-              <li class="flex items-start gap-2.5">
+          <div class="glass-card rounded-2xl p-5 sm:p-6 border-l-4 border-coastal-sage">
+            <h3 class="font-serif text-lg sm:text-xl font-semibold text-coastal-ocean mb-2">Core Clinical Pillars</h3>
+            <ul class="space-y-2.5 text-xs sm:text-sm text-coastal-slate">
+              <li class="flex items-start gap-2">
                 <i data-lucide="check" class="w-4 h-4 text-coastal-sage mt-0.5 shrink-0"></i>
-                <span><strong>Warm &amp; Grounded:</strong> Respectful, unhurried, and genuinely collaborative dialogue.</span>
+                <span><strong>Warm &amp; Grounded:</strong> Respectful, unhurried, collaborative dialogue[cite: 1, 2].</span>
               </li>
-              <li class="flex items-start gap-2.5">
+              <li class="flex items-start gap-2">
                 <i data-lucide="check" class="w-4 h-4 text-coastal-sage mt-0.5 shrink-0"></i>
-                <span><strong>Somatic &amp; Nervous System Focus:</strong> Integrating how chronic pressure lives in the body.</span>
+                <span><strong>Somatic &amp; Nervous System Focus:</strong> Integrating body tension and nervous regulation[cite: 2].</span>
               </li>
-              <li class="flex items-start gap-2.5">
+              <li class="flex items-start gap-2">
                 <i data-lucide="check" class="w-4 h-4 text-coastal-sage mt-0.5 shrink-0"></i>
-                <span><strong>Dual Licensure Modality:</strong> High-efficacy CBT with EMDR trauma processing.</span>
+                <span><strong>Dual Modality:</strong> High-efficacy CBT with EMDR trauma processing[cite: 1, 2].</span>
               </li>
             </ul>
           </div>
 
-          <div class="glass-card rounded-2xl p-6 bg-white/70">
-            <h4 class="font-serif text-lg font-medium text-coastal-ocean mb-1">A Good Fit If You:</h4>
+          <div class="glass-card rounded-2xl p-5 sm:p-6 bg-white/70">
+            <h4 class="font-serif text-base sm:text-lg font-medium text-coastal-ocean mb-1">A Good Fit If You:</h4>
             <p class="text-xs text-coastal-muted leading-relaxed">
-              Are looking for a therapist who balances structured practical tools with depth-oriented work, while understanding the real tensions of living and working in fast-paced California environments.
+              Are looking for a therapist who balances structured practical tools with depth-oriented work, while understanding the real tensions of living and working in fast-paced California environments[cite: 2].
             </p>
           </div>
         </div>
@@ -532,112 +557,112 @@
   </section>
 
   <!-- ==================== SANTA MONICA OFFICE SECTION ==================== -->
-  <section id="office" class="py-20 px-6 max-w-6xl mx-auto">
-    <div class="text-center max-w-2xl mx-auto mb-14">
+  <section id="office" class="py-16 sm:py-20 px-4 sm:px-6 max-w-6xl mx-auto">
+    <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
       <span class="text-xs font-semibold text-coastal-sage uppercase tracking-wider">The Practice Environment</span>
-      <h2 class="font-serif text-3xl sm:text-4xl text-coastal-ocean mt-2">A Quiet, Calming Santa Monica Space</h2>
-      <p class="text-sm text-coastal-muted mt-2">Designed with natural light and an uncluttered atmosphere to help you decompress the moment you arrive.</p>
+      <h2 class="font-serif text-2xl sm:text-4xl text-coastal-ocean mt-1 sm:mt-2">A Quiet, Calming Santa Monica Space</h2>
+      <p class="text-xs sm:text-sm text-coastal-muted mt-2">Designed with natural light and an uncluttered atmosphere to help you decompress the moment you arrive[cite: 2].</p>
     </div>
 
     <!-- Office Images Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-10">
       
       <!-- Office Image 1 -->
-      <div class="glass-card rounded-3xl overflow-hidden p-3 group">
-        <div class="relative h-72 rounded-2xl overflow-hidden bg-coastal-stone">
-          <img src="https://drive.google.com/thumbnail?id=1DwpoQD0VWsfGsl4J1CwtSb3Wxy5ePVJW&sz=w1000" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'" 
-               alt="Dr. Maya Reynolds Santa Monica Therapy Office" 
+      <div class="glass-card rounded-3xl overflow-hidden p-2.5 sm:p-3 group">
+        <div class="relative h-60 sm:h-72 rounded-2xl overflow-hidden bg-coastal-stone">
+          <img src="https://drive.google.com/thumbnail?id=1DwpoQD0VWsfGsl4J1CwtSb3Wxy5ePVJW&sz=w1000" 
+               alt="Dr. Maya Reynolds Santa Monica Therapy Office[cite: 2]" 
                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-          <div class="absolute bottom-3 left-3 bg-coastal-ocean/80 backdrop-blur-md px-3 py-1 rounded-full text-white text-[11px]">
-            Therapy Suite 1 &bull; Natural Light
+          <div class="absolute bottom-2.5 left-2.5 bg-coastal-ocean/80 backdrop-blur-md px-2.5 py-1 rounded-full text-white text-[10px] sm:text-[11px]">
+            Therapy Suite 1 &bull; Natural Light[cite: 2]
           </div>
         </div>
-        <div class="p-4">
-          <h3 class="font-serif text-lg font-semibold text-coastal-ocean">Serene, Private Consultation Room</h3>
+        <div class="p-3 sm:p-4">
+          <h3 class="font-serif text-base sm:text-lg font-semibold text-coastal-ocean">Serene, Private Consultation Room</h3>
           <p class="text-xs text-coastal-muted mt-1 leading-relaxed">
-            Quiet and uncluttered, facilitating open reflection, nervous system stabilization, and EMDR processing.
+            Quiet and uncluttered, facilitating open reflection, nervous system stabilization, and EMDR processing[cite: 2].
           </p>
         </div>
       </div>
 
       <!-- Office Image 2 -->
-      <div class="glass-card rounded-3xl overflow-hidden p-3 group">
-        <div class="relative h-72 rounded-2xl overflow-hidden bg-coastal-stone">
-          <img src="https://drive.google.com/thumbnail?id=1EqlCJsSNzGI93VgaQULRIwoFP2xiFioy&sz=w1000" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'" 
-               alt="Dr. Maya Reynolds Therapy Office Seating" 
+      <div class="glass-card rounded-3xl overflow-hidden p-2.5 sm:p-3 group">
+        <div class="relative h-60 sm:h-72 rounded-2xl overflow-hidden bg-coastal-stone">
+          <img src="https://drive.google.com/thumbnail?id=1EqlCJsSNzGI93VgaQULRIwoFP2xiFioy&sz=w1000" 
+               alt="Dr. Maya Reynolds Therapy Office Seating[cite: 2]" 
                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-          <div class="absolute bottom-3 left-3 bg-coastal-ocean/80 backdrop-blur-md px-3 py-1 rounded-full text-white text-[11px]">
+          <div class="absolute bottom-2.5 left-2.5 bg-coastal-ocean/80 backdrop-blur-md px-2.5 py-1 rounded-full text-white text-[10px] sm:text-[11px]">
             Comfort &amp; Grounding
           </div>
         </div>
-        <div class="p-4">
-          <h3 class="font-serif text-lg font-semibold text-coastal-ocean">Designed for Ease &amp; Safety</h3>
+        <div class="p-3 sm:p-4">
+          <h3 class="font-serif text-base sm:text-lg font-semibold text-coastal-ocean">Designed for Ease &amp; Safety</h3>
           <p class="text-xs text-coastal-muted mt-1 leading-relaxed">
-            Clients share that the physical environment itself helps them feel more at ease the moment they walk through the door.
+            Clients share that the physical environment itself helps them feel more at ease the moment they walk through the door[cite: 2].
           </p>
         </div>
       </div>
 
     </div>
 
-    <!-- Office Address and Format Cards with Prominent LOCATE BUTTON -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Office Address and Format Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
       
-      <!-- Santa Monica Office Card with Locate Button -->
-      <div class="glass-card rounded-2xl p-6 flex flex-col justify-between">
+      <!-- Santa Monica Office Card -->
+      <div class="glass-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between">
         <div>
-          <div class="w-10 h-10 rounded-xl bg-coastal-lightSage text-coastal-sage flex items-center justify-center mb-4">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-coastal-lightSage text-coastal-sage flex items-center justify-center mb-3">
             <i data-lucide="map-pin" class="w-5 h-5"></i>
           </div>
-          <h4 class="font-serif text-lg font-semibold text-coastal-ocean">Santa Monica Office</h4>
-          <p class="text-sm text-coastal-slate mt-2 leading-relaxed">
+          <h4 class="font-serif text-base sm:text-lg font-semibold text-coastal-ocean">Santa Monica Office</h4>
+          <p class="text-xs sm:text-sm text-coastal-slate mt-2 leading-relaxed">
             <strong>Address:</strong><br />
             123th Street 45 W,<br />
-            Santa Monica, CA 90401
+            Santa Monica, CA 90401[cite: 2]
           </p>
         </div>
-        <div class="mt-5 pt-4 border-t border-coastal-stone/80">
+        <div class="mt-4 pt-4 border-t border-coastal-stone/80">
           <a href="https://www.google.com/maps/dir/?api=1&destination=123th+Street+45+W,+Santa+Monica,+CA+90401" 
              target="_blank" 
              rel="noopener noreferrer" 
-             class="glass-btn-locate w-full py-2.5 px-4 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-2 transition-all">
-            <i data-lucide="navigation" class="w-4 h-4"></i>
+             class="glass-btn-locate w-full py-2 px-3 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
             <span>Locate Office</span>
           </a>
         </div>
       </div>
 
       <!-- California Telehealth Card -->
-      <div class="glass-card rounded-2xl p-6 flex flex-col justify-between">
+      <div class="glass-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between">
         <div>
-          <div class="w-10 h-10 rounded-xl bg-coastal-lightSage text-coastal-sage flex items-center justify-center mb-4">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-coastal-lightSage text-coastal-sage flex items-center justify-center mb-3">
             <i data-lucide="video" class="w-5 h-5"></i>
           </div>
-          <h4 class="font-serif text-lg font-semibold text-coastal-ocean">California Telehealth</h4>
-          <p class="text-sm text-coastal-slate mt-2 leading-relaxed">
-            Secure, encrypted video sessions available for adult residents across California (Los Angeles, Bay Area, San Diego, and statewide).
+          <h4 class="font-serif text-base sm:text-lg font-semibold text-coastal-ocean">California Telehealth</h4>
+          <p class="text-xs sm:text-sm text-coastal-slate mt-2 leading-relaxed">
+            Secure, encrypted video sessions available for adult residents across California (Los Angeles, Bay Area, San Diego, and statewide)[cite: 1, 2].
           </p>
         </div>
-        <div class="mt-5 pt-4 border-t border-coastal-stone/80 text-xs text-coastal-muted">
+        <div class="mt-4 pt-4 border-t border-coastal-stone/80 text-[11px] text-coastal-muted">
           HIPAA-compliant client portal &amp; easy calendar sync.
         </div>
       </div>
 
       <!-- Drive Gallery Card -->
-      <div class="glass-card rounded-2xl p-6 flex flex-col justify-between">
+      <div class="glass-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between">
         <div>
-          <div class="w-10 h-10 rounded-xl bg-coastal-lightSage text-coastal-sage flex items-center justify-center mb-4">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-coastal-lightSage text-coastal-sage flex items-center justify-center mb-3">
             <i data-lucide="folder" class="w-5 h-5"></i>
           </div>
-          <h4 class="font-serif text-lg font-semibold text-coastal-ocean">Drive Gallery</h4>
-          <p class="text-sm text-coastal-slate mt-2 leading-relaxed">
-            View full resolution office photography and walkthrough assets on our shared practice folder.
+          <h4 class="font-serif text-base sm:text-lg font-semibold text-coastal-ocean">Drive Gallery</h4>
+          <p class="text-xs sm:text-sm text-coastal-slate mt-2 leading-relaxed">
+            View full resolution office photography and walkthrough assets on our shared practice folder[cite: 2].
           </p>
         </div>
-        <div class="mt-5 pt-4 border-t border-coastal-stone/80">
+        <div class="mt-4 pt-4 border-t border-coastal-stone/80">
           <a href="https://drive.google.com/drive/folders/1fbAMSdqGF_ltNc0JiltkpIr_C26kRvLs?usp=drive_link" 
              target="_blank" 
-             rel="noopener noreferrer"
+             rel="noopener noreferrer" 
              class="inline-flex items-center gap-1.5 text-xs font-semibold text-coastal-sage hover:underline">
             <span>Open Office Folder</span>
             <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
@@ -649,58 +674,58 @@
   </section>
 
   <!-- ==================== DYNAMIC SPECIALTIES SECTION ==================== -->
-  <section id="specialties" class="py-20 px-6 backdrop-blur-sm bg-white/40 border-t border-coastal-stone/70">
+  <section id="specialties" class="py-16 sm:py-20 px-4 sm:px-6 backdrop-blur-sm bg-white/40 border-t border-coastal-stone/70">
     <div class="max-w-5xl mx-auto">
-      <div class="text-center max-w-2xl mx-auto mb-12">
+      <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
         <span class="text-xs font-semibold text-coastal-sage uppercase tracking-wider">Clinical Focus</span>
-        <h2 class="font-serif text-3xl sm:text-4xl text-coastal-ocean mt-2">Specialized Support for Adults</h2>
-        <p class="text-sm text-coastal-muted mt-2">Click each tab to view how we work through each challenge collaboratively.</p>
+        <h2 class="font-serif text-2xl sm:text-4xl text-coastal-ocean mt-1 sm:mt-2">Specialized Support for Adults</h2>
+        <p class="text-xs sm:text-sm text-coastal-muted mt-2">Click each tab to view how we work through each challenge collaboratively.</p>
       </div>
 
       <!-- Tab Buttons -->
-      <div class="flex flex-wrap justify-center gap-2 mb-8">
-        <button onclick="switchTab('anxiety')" id="tab-anxiety" class="specialty-tab active glass-btn-primary px-5 py-2.5 rounded-full text-xs font-medium text-white transition-all">
+      <div class="flex flex-wrap justify-center gap-2 mb-6 sm:mb-8">
+        <button onclick="switchTab('anxiety')" id="tab-anxiety" class="specialty-tab active glass-btn-primary px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-medium text-white transition-all">
           Anxiety &amp; Panic
         </button>
-        <button onclick="switchTab('burnout')" id="tab-burnout" class="specialty-tab glass-btn-secondary px-5 py-2.5 rounded-full text-xs font-medium text-coastal-slate transition-all">
+        <button onclick="switchTab('burnout')" id="tab-burnout" class="specialty-tab glass-btn-secondary px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-medium text-coastal-slate transition-all">
           Executive Burnout
         </button>
-        <button onclick="switchTab('trauma')" id="tab-trauma" class="specialty-tab glass-btn-secondary px-5 py-2.5 rounded-full text-xs font-medium text-coastal-slate transition-all">
+        <button onclick="switchTab('trauma')" id="tab-trauma" class="specialty-tab glass-btn-secondary px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-medium text-coastal-slate transition-all">
           Trauma &amp; EMDR
         </button>
-        <button onclick="switchTab('perfectionism')" id="tab-perfectionism" class="specialty-tab glass-btn-secondary px-5 py-2.5 rounded-full text-xs font-medium text-coastal-slate transition-all">
+        <button onclick="switchTab('perfectionism')" id="tab-perfectionism" class="specialty-tab glass-btn-secondary px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-medium text-coastal-slate transition-all">
           Perfectionism
         </button>
       </div>
 
       <!-- Tab Content Cards -->
-      <div id="tab-content" class="glass-card rounded-3xl p-8 transition-all duration-300">
+      <div id="tab-content" class="glass-card rounded-3xl p-5 sm:p-8 transition-all duration-300">
         <!-- Content injected via JS -->
       </div>
     </div>
   </section>
 
   <!-- ==================== INTERACTIVE SELF-CHECK QUIZ ==================== -->
-  <section id="quiz" class="py-20 px-6 max-w-3xl mx-auto">
-    <div class="glass-card rounded-3xl p-8 sm:p-10 border border-white shadow-xl">
-      <div class="flex items-center gap-2 text-xs font-semibold text-coastal-sage uppercase tracking-wider mb-2">
-        <i data-lucide="sparkles" class="w-4 h-4"></i>
+  <section id="quiz" class="py-16 sm:py-20 px-4 sm:px-6 max-w-3xl mx-auto">
+    <div class="glass-card rounded-3xl p-5 sm:p-10 border border-white shadow-xl">
+      <div class="flex items-center gap-1.5 text-xs font-semibold text-coastal-sage uppercase tracking-wider mb-2">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
         <span>Quick Self-Reflection</span>
       </div>
-      <h2 class="font-serif text-2xl sm:text-3xl text-coastal-ocean mb-3">Checking In With Your Nervous System</h2>
-      <p class="text-xs text-coastal-muted leading-relaxed mb-6">
+      <h2 class="font-serif text-xl sm:text-3xl text-coastal-ocean mb-2 sm:mb-3">Checking In With Your Nervous System</h2>
+      <p class="text-xs text-coastal-muted leading-relaxed mb-5 sm:mb-6">
         Take a breath. Answer these 3 brief questions to assess whether your internal stress pattern leans toward chronic bracing, hyperarousal, or burnout.
       </p>
 
-      <form id="quizForm" class="space-y-6" onsubmit="event.preventDefault(); calculateCheck();">
+      <form id="quizForm" class="space-y-4 sm:space-y-6" onsubmit="event.preventDefault(); calculateCheck();">
         <div class="space-y-2">
-          <label class="text-sm font-medium text-coastal-slate block">1. When things slow down at night or on weekends, what happens?</label>
+          <label class="text-xs sm:text-sm font-medium text-coastal-slate block">1. When things slow down at night or on weekends, what happens?</label>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-2 p-3 rounded-xl border border-coastal-stone/80 cursor-pointer hover:bg-coastal-lightSage/40 bg-white/60">
+            <label class="flex items-center gap-2 p-2.5 sm:p-3 rounded-xl border border-coastal-stone/80 cursor-pointer hover:bg-coastal-lightSage/40 bg-white/60">
               <input type="radio" name="q1" value="anxiety" required />
               <span>My mind races; I feel anxious or on edge</span>
             </label>
-            <label class="flex items-center gap-2 p-3 rounded-xl border border-coastal-stone/80 cursor-pointer hover:bg-coastal-lightSage/40 bg-white/60">
+            <label class="flex items-center gap-2 p-2.5 sm:p-3 rounded-xl border border-coastal-stone/80 cursor-pointer hover:bg-coastal-lightSage/40 bg-white/60">
               <input type="radio" name="q1" value="burnout" />
               <span>I collapse in exhaustion and feel numb</span>
             </label>
@@ -708,13 +733,13 @@
         </div>
 
         <div class="space-y-2">
-          <label class="text-sm font-medium text-coastal-slate block">2. How does physical tension typically show up?</label>
+          <label class="text-xs sm:text-sm font-medium text-coastal-slate block">2. How does physical tension typically show up?</label>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-2 p-3 rounded-xl border border-coastal-stone/80 cursor-pointer hover:bg-coastal-lightSage/40 bg-white/60">
+            <label class="flex items-center gap-2 p-2.5 sm:p-3 rounded-xl border border-coastal-stone/80 cursor-pointer hover:bg-coastal-lightSage/40 bg-white/60">
               <input type="radio" name="q2" value="anxiety" required />
               <span>Jaw clenching, shallow breathing, chest tightness</span>
             </label>
-            <label class="flex items-center gap-2 p-3 rounded-xl border border-coastal-stone/80 cursor-pointer hover:bg-coastal-lightSage/40 bg-white/60">
+            <label class="flex items-center gap-2 p-2.5 sm:p-3 rounded-xl border border-coastal-stone/80 cursor-pointer hover:bg-coastal-lightSage/40 bg-white/60">
               <input type="radio" name="q2" value="burnout" />
               <span>Heavy limbs, brain fog, chronic sluggishness</span>
             </label>
@@ -722,13 +747,13 @@
         </div>
 
         <div class="space-y-2">
-          <label class="text-sm font-medium text-coastal-slate block">3. When considering taking rest or saying "no":</label>
+          <label class="text-xs sm:text-sm font-medium text-coastal-slate block">3. When considering taking rest or saying "no":</label>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-2 p-3 rounded-xl border border-coastal-stone/80 cursor-pointer hover:bg-coastal-lightSage/40 bg-white/60">
+            <label class="flex items-center gap-2 p-2.5 sm:p-3 rounded-xl border border-coastal-stone/80 cursor-pointer hover:bg-coastal-lightSage/40 bg-white/60">
               <input type="radio" name="q3" value="anxiety" required />
               <span>Guilt triggers an urge to do more to feel safe</span>
             </label>
-            <label class="flex items-center gap-2 p-3 rounded-xl border border-coastal-stone/80 cursor-pointer hover:bg-coastal-lightSage/40 bg-white/60">
+            <label class="flex items-center gap-2 p-2.5 sm:p-3 rounded-xl border border-coastal-stone/80 cursor-pointer hover:bg-coastal-lightSage/40 bg-white/60">
               <input type="radio" name="q3" value="burnout" />
               <span>I just lack the energy to push forward anymore</span>
             </label>
@@ -740,38 +765,38 @@
         </button>
       </form>
 
-      <div id="quizResult" class="hidden mt-6 p-5 rounded-2xl bg-coastal-lightSage/80 border border-coastal-sage/20 text-xs leading-relaxed text-coastal-slate">
+      <div id="quizResult" class="hidden mt-5 sm:mt-6 p-4 sm:p-5 rounded-2xl bg-coastal-lightSage/80 border border-coastal-sage/20 text-xs leading-relaxed text-coastal-slate">
         <!-- Injected via JS -->
       </div>
     </div>
   </section>
 
   <!-- ==================== CLEAN FOOTER ==================== -->
-  <footer class="py-14 px-6 bg-coastal-ocean text-white border-t border-white/10">
-    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+  <footer class="py-12 sm:py-14 px-4 sm:px-6 bg-coastal-ocean text-white border-t border-white/10">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6 text-center md:text-left">
       <div>
-        <h4 class="font-serif text-xl font-medium">Dr. Maya Reynolds, PsyD</h4>
-        <p class="text-xs text-white/60 mt-1">123th Street 45 W, Santa Monica, CA 90401 &bull; In-Person &amp; Telehealth</p>
+        <h4 class="font-serif text-lg sm:text-xl font-medium">Dr. Maya Reynolds, PsyD</h4>
+        <p class="text-xs text-white/60 mt-1">123th Street 45 W, Santa Monica, CA 90401 &bull; In-Person &amp; Telehealth[cite: 1, 2]</p>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2.5 sm:gap-3">
         <a href="https://www.google.com/maps/dir/?api=1&destination=123th+Street+45+W,+Santa+Monica,+CA+90401" 
            target="_blank" 
            rel="noopener noreferrer" 
-           class="glass-btn-locate text-xs font-medium px-4 py-2 rounded-full inline-flex items-center gap-1.5">
+           class="glass-btn-locate text-xs font-medium px-3.5 sm:px-4 py-2 rounded-full inline-flex items-center gap-1.5">
           <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
           <span>Locate Office</span>
         </a>
         
-        <button onclick="openConsultDrawer()" class="glass-btn-primary text-xs font-medium px-5 py-2.5 rounded-full inline-flex items-center gap-1.5 text-white cursor-pointer shadow-md">
+        <button onclick="openConsultDrawer()" class="glass-btn-primary text-xs font-medium px-4 sm:px-5 py-2 sm:py-2.5 rounded-full inline-flex items-center gap-1.5 text-white cursor-pointer shadow-md">
           <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-300"></i>
           <span>Consultation Form</span>
         </button>
       </div>
     </div>
 
-    <div class="max-w-5xl mx-auto mt-10 pt-6 border-t border-white/10 text-center text-[11px] text-white/40 space-y-1">
-      <p>&copy; 2026 Dr. Maya Reynolds, PsyD. Licensed Clinical Psychologist. Fictional Therapist Profile &amp; Demonstration Suite.</p>
+    <div class="max-w-5xl mx-auto mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/10 text-center text-[10px] sm:text-[11px] text-white/40 space-y-1">
+      <p>&copy; 2026 Dr. Maya Reynolds, PsyD. Licensed Clinical Psychologist. Fictional Therapist Profile &amp; Demonstration Suite[cite: 2].</p>
       <p>If you are experiencing a mental health emergency, please dial 988 or go to the nearest emergency room.</p>
     </div>
   </footer>
@@ -779,7 +804,23 @@
   <!-- ==================== INTERACTION & ROUTER SCRIPT ==================== -->
   <script>
     // Initialize Lucide Icons
-    if (window.lucide) lucide.createIcons();
+    lucide.createIcons();
+
+    // Scroll Listener: Unpin hover bar & move consult button into its place at top center
+    const consultWrapper = document.getElementById('consultButtonWrapper');
+    const scrollThreshold = 90; // Pixels scrolled before swapping
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > scrollThreshold) {
+        // Scrolled down: Move consult button to top center where the hover bar originally was
+        consultWrapper.classList.remove('consult-initial');
+        consultWrapper.classList.add('consult-pinned-top');
+      } else {
+        // Scrolled to top: Move consult button back to original position below the tabs bar
+        consultWrapper.classList.remove('consult-pinned-top');
+        consultWrapper.classList.add('consult-initial');
+      }
+    }, { passive: true });
 
     // Consultation Slide-Out Drawer Logic
     const drawer = document.getElementById('consultDrawer');
@@ -864,23 +905,23 @@
     const specialtiesData = {
       anxiety: {
         title: "Anxiety & Panic Stabilization",
-        body: "Many clients come to me feeling 'functional' on the outside while quietly struggling with constant worry, physical tension, racing thoughts, or difficulty sleeping. We integrate Cognitive Behavioral Therapy (CBT) with mindfulness and physiological grounding to help your nervous system recognize real safety.",
-        bullets: ["Addressing constant internal dread & overthinking", "Panic attack mitigation & somatic regulation", "Developing sustainable calming routines"]
+        body: "Many clients come to me feeling 'functional' on the outside while quietly struggling with constant worry, physical tension, racing thoughts, or difficulty sleeping[cite: 2]. We integrate Cognitive Behavioral Therapy (CBT) with mindfulness and physiological grounding to help your nervous system recognize real safety[cite: 1, 2].",
+        bullets: ["Addressing constant internal dread & overthinking[cite: 2]", "Panic attack mitigation & somatic regulation[cite: 1, 2]", "Developing sustainable calming routines[cite: 2]"]
       },
       burnout: {
         title: "Executive & Professional Burnout",
-        body: "High internal pressure and chronic workplace demands frequently disconnect entrepreneurs, creatives, and executives from their vitality. Therapy becomes a designated sanctuary to slow down, dismantle unsustainable patterns, and establish firm energetic boundaries.",
-        bullets: ["Decompressing from high-intensity environments", "Recovering cognitive and emotional capacity", "Cultivating sustainable ambition without chronic exhaustion"]
+        body: "High internal pressure and chronic workplace demands frequently disconnect entrepreneurs, creatives, and executives from their vitality[cite: 2]. Therapy becomes a designated sanctuary to slow down, dismantle unsustainable patterns, and establish firm energetic boundaries[cite: 2].",
+        bullets: ["Decompressing from high-intensity environments[cite: 2]", "Recovering cognitive and emotional capacity[cite: 2]", "Cultivating sustainable ambition without chronic exhaustion[cite: 2]"]
       },
       trauma: {
         title: "Trauma Work & EMDR Therapy",
-        body: "Trauma work is paced carefully with an emphasis on emotional safety and stabilization. Whether you are navigating single-incident trauma or complex patterns from earlier life, we utilize EMDR and body-oriented therapies to help you process experiences without becoming re-traumatized.",
-        bullets: ["Safe, paced processing of past wounds", "EMDR bilateral stimulation methods", "Rebuilding relational trust and somatic calm"]
+        body: "Trauma work is paced carefully with an emphasis on emotional safety and stabilization[cite: 2]. Whether you are navigating single-incident trauma or complex patterns from earlier life, we utilize EMDR and body-oriented therapies to help you process experiences without becoming re-traumatized[cite: 1, 2].",
+        bullets: ["Safe, paced processing of past wounds[cite: 2]", "EMDR bilateral stimulation methods[cite: 1, 2]", "Rebuilding relational trust and somatic calm[cite: 2]"]
       },
       perfectionism: {
         title: "Perfectionism & High Internal Pressure",
-        body: "Clients often feel trapped in a relentless cycle of needing to excel to validate their worth. We unpack the roots of this inner critic, cultivating self-compassion, emotional agility, and genuine ease in everyday life.",
-        bullets: ["Calming hyper-vigilance and fear of falling short", "Softening harsh self-criticism", "Reclaiming spontaneous joy and uncurated presence"]
+        body: "Clients often feel trapped in a relentless cycle of needing to excel to validate their worth[cite: 2]. We unpack the roots of this inner critic, cultivating self-compassion, emotional agility, and genuine ease in everyday life[cite: 2].",
+        bullets: ["Calming hyper-vigilance and fear of falling short[cite: 2]", "Softening harsh self-criticism[cite: 2]", "Reclaiming spontaneous joy and uncurated presence[cite: 2]"]
       }
     };
 
@@ -888,12 +929,12 @@
       const data = specialtiesData[key];
       const container = document.getElementById('tab-content');
       container.innerHTML = `
-        <div class="space-y-4">
-          <h3 class="font-serif text-2xl font-semibold text-coastal-ocean">${data.title}</h3>
-          <p class="text-sm text-coastal-slate leading-relaxed font-light">${data.body}</p>
+        <div class="space-y-3 sm:space-y-4">
+          <h3 class="font-serif text-xl sm:text-2xl font-semibold text-coastal-ocean">${data.title}</h3>
+          <p class="text-xs sm:text-sm text-coastal-slate leading-relaxed font-light">${data.body}</p>
           <div class="pt-2">
             <h4 class="text-xs font-semibold text-coastal-sage uppercase tracking-wider mb-2">What We Focus On:</h4>
-            <ul class="space-y-2 text-xs text-coastal-slate">
+            <ul class="space-y-1.5 text-xs text-coastal-slate">
               ${data.bullets.map(b => `<li class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-coastal-sage"></span>${b}</li>`).join('')}
             </ul>
           </div>
@@ -903,11 +944,11 @@
 
     function switchTab(key) {
       document.querySelectorAll('.specialty-tab').forEach(b => {
-        b.className = 'specialty-tab glass-btn-secondary px-5 py-2.5 rounded-full text-xs font-medium text-coastal-slate transition-all';
+        b.className = 'specialty-tab glass-btn-secondary px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-medium text-coastal-slate transition-all';
       });
       const activeBtn = document.getElementById('tab-' + key);
       if (activeBtn) {
-        activeBtn.className = 'specialty-tab active glass-btn-primary px-5 py-2.5 rounded-full text-xs font-medium text-white transition-all';
+        activeBtn.className = 'specialty-tab active glass-btn-primary px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-medium text-white transition-all';
       }
       renderTab(key);
     }
@@ -929,13 +970,13 @@
 
       if (counts.anxiety >= 2) {
         resultBox.innerHTML = `
-          <strong class="text-coastal-ocean block text-sm mb-1 font-serif">Pattern Detected: Sympathetic Hyperarousal (High Anxiety)</strong>
-          Your answers indicate that your nervous system is in a state of high alert or bracing for impact. Therapy with Dr. Reynolds focuses on calming this biological alarm system using CBT and somatic grounding so you can experience authentic mental rest.
+          <strong class="text-coastal-ocean block text-xs sm:text-sm mb-1 font-serif">Pattern Detected: Sympathetic Hyperarousal (High Anxiety)</strong>
+          Your answers indicate that your nervous system is in a state of high alert or bracing for impact[cite: 2]. Therapy with Dr. Reynolds focuses on calming this biological alarm system using CBT and somatic grounding so you can experience authentic mental rest[cite: 1, 2].
         `;
       } else {
         resultBox.innerHTML = `
-          <strong class="text-coastal-ocean block text-sm mb-1 font-serif">Pattern Detected: Parasympathetic Depletion (Burnout)</strong>
-          Your system appears to be depleted from chronic internal or external pressure. In our work, we prioritize gentle nervous system pacing, rebuilding your energy reserves, and addressing the root causes of exhaustion.
+          <strong class="text-coastal-ocean block text-xs sm:text-sm mb-1 font-serif">Pattern Detected: Parasympathetic Depletion (Burnout)</strong>
+          Your system appears to be depleted from chronic internal or external pressure[cite: 2]. In our work, we prioritize gentle nervous system pacing, rebuilding your energy reserves, and addressing the root causes of exhaustion[cite: 2].
         `;
       }
     }
